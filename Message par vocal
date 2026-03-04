@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Message Vocal</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+–bg: #0d0d0f;
+–surface: #16161a;
+–surface2: #1e1e24;
+–accent: #c8f060;
+–accent2: #60f0c8;
+–text: #f0ede8;
+–muted: #6e6e7a;
+–danger: #f06060;
+–radius: 20px;
+}
+
+body {
+background: var(–bg);
+color: var(–text);
+font-family: ‘DM Sans’, sans-serif;
+min-height: 100vh;
+display: flex;
+align-items: center;
+justify-content: center;
+padding: 24px;
+overflow: hidden;
+}
+
+body::before {
+content: ‘’;
+position: fixed;
+top: -40%;
+left: -20%;
+width: 80vw;
+height: 80vw;
+background: radial-gradient(circle, rgba(200,240,96,0.07) 0%, transparent 70%);
+pointer-events: none;
+}
+
+.card {
+width: 100%;
+max-width: 380px;
+background: var(–surface);
+border-radius: var(–radius);
+border: 1px solid rgba(255,255,255,0.06);
+padding: 32px 28px;
+display: flex;
+flex-direction: column;
+gap: 24px;
+position: relative;
+box-shadow: 0 32px 64px rgba(0,0,0,0.5);
+}
+
+.header {
+display: flex;
+flex-direction: column;
+gap: 4px;
+}
+
+.label {
+font-size: 11px;
+letter-spacing: 0.15em;
+text-transform: uppercase;
+color: var(–muted);
+}
+
+.title {
+font-family: ‘DM Serif Display’, serif;
+font-size: 26px;
+color: var(–text);
+line-height: 1.15;
+}
+
+/* Contact selector */
+.contact-row {
+display: flex;
+gap: 10px;
+flex-wrap: wrap;
+}
+
+.contact-chip {
+display: flex;
+align-items: center;
+gap: 8px;
+padding: 8px 14px;
+border-radius: 50px;
+border: 1.5px solid rgba(255,255,255,0.08);
+background: var(–surface2);
+cursor: pointer;
+transition: all 0.18s;
+font-size: 13px;
+color: var(–muted);
+position: relative;
+}
+
+.contact-chip.active {
+border-color: var(–accent);
+color: var(–accent);
+background: rgba(200,240,96,0.08);
+}
+
+.contact-chip .avatar {
+width: 24px;
+height: 24px;
+border-radius: 50%;
+background: linear-gradient(135deg, var(–accent), var(–accent2));
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 11px;
+font-weight: 600;
+color: #0d0d0f;
+}
+
+.add-contact {
+padding: 8px 14px;
+border-radius: 50px;
+border: 1.5px dashed rgba(255,255,255,0.15);
+background: transparent;
+cursor: pointer;
+font-size: 13px;
+color: var(–muted);
+transition: all 0.18s;
+font-family: ‘DM Sans’, sans-serif;
+}
+
+.add-contact:hover { border-color: var(–accent); color: var(–accent); }
+
+/* Input numéro */
+.phone-input {
+display: none;
+flex-direction: column;
+gap: 8px;
+}
+
+.phone-input.visible { display: flex; }
+
+.phone-input input {
+background: var(–surface2);
+border: 1.5px solid rgba(255,255,255,0.08);
+border-radius: 12px;
+padding: 12px 16px;
+color: var(–text);
+font-family: ‘DM Sans’, sans-serif;
+font-size: 14px;
+outline: none;
+transition: border-color 0.18s;
+}
+
+.phone-input input:focus { border-color: var(–accent); }
+.phone-input input::placeholder { color: var(–muted); }
+
+.phone-actions {
+display: flex;
+gap: 8px;
+}
+
+.btn-small {
+padding: 8px 16px;
+border-radius: 10px;
+font-size: 12px;
+font-family: ‘DM Sans’, sans-serif;
+cursor: pointer;
+border: none;
+transition: all 0.15s;
+}
+
+.btn-confirm { background: var(–accent); color: #0d0d0f; font-weight: 600; }
+.btn-cancel { background: var(–surface2); color: var(–muted); }
+.btn-confirm:hover { opacity: 0.88; }
+.btn-cancel:hover { color: var(–text); }
+
+/* Zone d’enregistrement */
+.record-zone {
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 16px;
+padding: 8px 0;
+}
+
+.mic-btn {
+width: 88px;
+height: 88px;
+border-radius: 50%;
+border: none;
+background: var(–surface2);
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+position: relative;
+transition: transform 0.15s, background 0.2s;
+outline: none;
+}
+
+.mic-btn:hover { transform: scale(1.05); }
+
+.mic-btn.recording {
+background: rgba(240,96,96,0.15);
+animation: pulse-ring 1.2s ease-out infinite;
+}
+
+.mic-btn.recording svg { color: var(–danger); }
+
+@keyframes pulse-ring {
+0% { box-shadow: 0 0 0 0 rgba(240,96,96,0.35); }
+70% { box-shadow: 0 0 0 22px rgba(240,96,96,0); }
+100% { box-shadow: 0 0 0 0 rgba(240,96,96,0); }
+}
+
+.mic-btn svg {
+width: 36px;
+height: 36px;
+color: var(–accent);
+transition: color 0.2s;
+}
+
+/* Waveform */
+.waveform {
+display: flex;
+align-items: center;
+gap: 3px;
+height: 32px;
+opacity: 0;
+transition: opacity 0.3s;
+}
+
+.waveform.active { opacity: 1; }
+
+.bar {
+width: 3px;
+background: var(–accent);
+border-radius: 2px;
+height: 6px;
+transition: height 0.1s;
+}
+
+.recording .bar {
+animation: wave 0.8s ease-in-out infinite;
+}
+
+.bar:nth-child(2) { animation-delay: 0.1s; }
+.bar:nth-child(3) { animation-delay: 0.2s; }
+.bar:nth-child(4) { animation-delay: 0.15s; }
+.bar:nth-child(5) { animation-delay: 0.05s; }
+.bar:nth-child(6) { animation-delay: 0.25s; }
+.bar:nth-child(7) { animation-delay: 0.1s; }
+
+@keyframes wave {
+0%, 100% { height: 4px; }
+50% { height: 24px; }
+}
+
+.record-hint {
+font-size: 12px;
+color: var(–muted);
+text-align: center;
+line-height: 1.5;
+}
+
+/* Transcript */
+.transcript-box {
+background: var(–surface2);
+border-radius: 14px;
+padding: 16px;
+min-height: 70px;
+font-size: 15px;
+line-height: 1.55;
+color: var(–text);
+border: 1.5px solid rgba(255,255,255,0.05);
+position: relative;
+transition: border-color 0.2s;
+}
+
+.transcript-box:focus-within,
+.transcript-box.has-text { border-color: rgba(200,240,96,0.2); }
+
+.transcript-content {
+outline: none;
+min-height: 40px;
+cursor: text;
+}
+
+.transcript-content:empty::before {
+content: attr(data-placeholder);
+color: var(–muted);
+font-style: italic;
+}
+
+.transcript-tag {
+position: absolute;
+top: -9px;
+left: 14px;
+background: var(–surface);
+padding: 0 8px;
+font-size: 10px;
+letter-spacing: 0.12em;
+text-transform: uppercase;
+color: var(–muted);
+}
+
+/* Bouton envoyer */
+.send-btn {
+width: 100%;
+padding: 16px;
+border-radius: 14px;
+border: none;
+background: var(–accent);
+color: #0d0d0f;
+font-family: ‘DM Sans’, sans-serif;
+font-size: 15px;
+font-weight: 600;
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 10px;
+transition: all 0.18s;
+letter-spacing: 0.02em;
+}
+
+.send-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(200,240,96,0.25); }
+.send-btn:active { transform: translateY(0); }
+.send-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.send-btn svg { width: 18px; height: 18px; }
+
+/* Status */
+.status-bar {
+display: flex;
+align-items: center;
+gap: 8px;
+font-size: 12px;
+color: var(–muted);
+min-height: 16px;
+}
+
+.status-dot {
+width: 6px;
+height: 6px;
+border-radius: 50%;
+background: var(–muted);
+transition: background 0.2s;
+flex-shrink: 0;
+}
+
+.status-dot.active { background: var(–accent); animation: blink 1s step-end infinite; }
+.status-dot.error { background: var(–danger); }
+
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* No support */
+.no-support {
+text-align: center;
+padding: 12px;
+background: rgba(240,96,96,0.1);
+border-radius: 12px;
+font-size: 13px;
+color: var(–danger);
+display: none;
+}
+</style>
+
+</head>
+<body>
+
+<div class="card">
+  <div class="header">
+    <span class="label">Message vocal</span>
+    <h1 class="title">Parle,<br><em>j'envoie.</em></h1>
+  </div>
+
+  <!-- Contacts -->
+
+  <div>
+    <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Destinataire</div>
+    <div class="contact-row" id="contactRow">
+      <div class="contact-chip active" data-phone="" data-name="Momo" onclick="selectContact(this)">
+        <div class="avatar">M</div>
+        Momo
+      </div>
+      <button class="add-contact" onclick="showAddContact()">+ Ajouter</button>
+    </div>
+    <div class="phone-input" id="phoneInput">
+      <input type="text" id="contactName" placeholder="Prénom (ex: Sarah)" />
+      <input type="tel" id="contactPhone" placeholder="Numéro (ex: +33612345678)" />
+      <div class="phone-actions">
+        <button class="btn-small btn-confirm" onclick="addContact()">Confirmer</button>
+        <button class="btn-small btn-cancel" onclick="hideAddContact()">Annuler</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Micro -->
+
+  <div class="record-zone">
+    <button class="mic-btn" id="micBtn" onclick="toggleRecord()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+        <line x1="12" y1="19" x2="12" y2="23"/>
+        <line x1="8" y1="23" x2="16" y2="23"/>
+      </svg>
+    </button>
+
+```
+<div class="waveform" id="waveform">
+  <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+  <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+  <div class="bar"></div>
+</div>
+
+<p class="record-hint" id="recordHint">Appuie pour dicter ton message</p>
+```
+
+  </div>
+
+  <!-- Transcript -->
+
+  <div class="transcript-box" id="transcriptBox">
+    <span class="transcript-tag">Message</span>
+    <div class="transcript-content" id="transcriptContent"
+         contenteditable="true"
+         data-placeholder="Ton message apparaîtra ici..."></div>
+  </div>
+
+  <!-- Status -->
+
+  <div class="status-bar">
+    <div class="status-dot" id="statusDot"></div>
+    <span id="statusText">En attente</span>
+  </div>
+
+  <!-- No support warning -->
+
+  <div class="no-support" id="noSupport">
+    ⚠️ La reconnaissance vocale n'est pas supportée sur ce navigateur. Tape ton message manuellement.
+  </div>
+
+  <!-- Send -->
+
+  <button class="send-btn" id="sendBtn" onclick="sendSMS()" disabled>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+    </svg>
+    Ouvrir dans SMS
+  </button>
+</div>
+
+<script>
+let recognition = null;
+let isRecording = false;
+let finalTranscript = '';
+
+const contacts = [{ name: 'Momo', phone: '' }];
+let selectedContact = contacts[0];
+
+// Init speech recognition
+function initRecognition() {
+  const SRE = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SRE) {
+    document.getElementById('noSupport').style.display = 'block';
+    document.getElementById('micBtn').disabled = true;
+    return false;
+  }
+  recognition = new SRE();
+  recognition.lang = 'fr-FR';
+  recognition.interimResults = true;
+  recognition.continuous = true;
+
+  recognition.onresult = (e) => {
+    let interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) finalTranscript += e.results[i][0].transcript;
+      else interim += e.results[i][0].transcript;
+    }
+    document.getElementById('transcriptContent').textContent = finalTranscript + interim;
+    updateSendBtn();
+    document.getElementById('transcriptBox').classList.toggle('has-text', !!(finalTranscript + interim));
+  };
+
+  recognition.onerror = (e) => {
+    setStatus('Erreur micro : ' + e.error, 'error');
+    stopRecording();
+  };
+
+  recognition.onend = () => { if (isRecording) recognition.start(); };
+  return true;
+}
+
+function toggleRecord() {
+  if (!recognition && !initRecognition()) return;
+  isRecording ? stopRecording() : startRecording();
+}
+
+function startRecording() {
+  finalTranscript = '';
+  isRecording = true;
+  recognition.start();
+  document.getElementById('micBtn').classList.add('recording');
+  document.getElementById('waveform').classList.add('active');
+  document.getElementById('recordHint').textContent = 'Parle maintenant… Rappuie pour arrêter';
+  setStatus('Enregistrement en cours…', 'active');
+}
+
+function stopRecording() {
+  isRecording = false;
+  recognition.stop();
+  document.getElementById('micBtn').classList.remove('recording');
+  document.getElementById('waveform').classList.remove('active');
+  document.getElementById('recordHint').textContent = 'Appuie pour dicter ton message';
+  const text = document.getElementById('transcriptContent').textContent.trim();
+  setStatus(text ? 'Message prêt ✓' : 'En attente', text ? 'active' : '');
+  updateSendBtn();
+}
+
+function updateSendBtn() {
+  const text = document.getElementById('transcriptContent').textContent.trim();
+  document.getElementById('sendBtn').disabled = !text;
+}
+
+function setStatus(msg, type) {
+  document.getElementById('statusText').textContent = msg;
+  const dot = document.getElementById('statusDot');
+  dot.className = 'status-dot' + (type ? ' ' + type : '');
+}
+
+function sendSMS() {
+  const text = document.getElementById('transcriptContent').textContent.trim();
+  if (!text) return;
+  const phone = selectedContact.phone || '';
+  const uri = `sms:${phone}${phone ? '?' : ''}body=${encodeURIComponent(text)}`;
+  window.location.href = uri;
+}
+
+// Contacts
+function selectContact(el) {
+  document.querySelectorAll('.contact-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  const name = el.dataset.name;
+  selectedContact = contacts.find(c => c.name === name) || contacts[0];
+}
+
+function showAddContact() {
+  document.getElementById('phoneInput').classList.add('visible');
+}
+
+function hideAddContact() {
+  document.getElementById('phoneInput').classList.remove('visible');
+  document.getElementById('contactName').value = '';
+  document.getElementById('contactPhone').value = '';
+}
+
+function addContact() {
+  const name = document.getElementById('contactName').value.trim();
+  const phone = document.getElementById('contactPhone').value.trim();
+  if (!name) { alert('Entre un prénom.'); return; }
+
+  const contact = { name, phone };
+  contacts.push(contact);
+
+  const row = document.getElementById('contactRow');
+  const addBtn = row.querySelector('.add-contact');
+  const chip = document.createElement('div');
+  chip.className = 'contact-chip';
+  chip.dataset.name = name;
+  chip.dataset.phone = phone;
+  chip.innerHTML = `<div class="avatar">${name[0].toUpperCase()}</div>${name}`;
+  chip.onclick = function() { selectContact(this); };
+  row.insertBefore(chip, addBtn);
+
+  hideAddContact();
+  selectContact(chip);
+}
+
+// Listen for manual edits in transcript
+document.getElementById('transcriptContent').addEventListener('input', updateSendBtn);
+</script>
+
+</body>
+</html>
