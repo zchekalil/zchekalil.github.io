@@ -18,7 +18,8 @@
   --radius:8px;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-body{background:var(--bg);font-family:var(--font);color:var(--t1);height:100vh;overflow:hidden;user-select:none;}
+html{height:-webkit-fill-available;height:100%;}
+body{background:var(--bg);font-family:var(--font);color:var(--t1);height:100vh;height:-webkit-fill-available;overflow:hidden;user-select:none;}
 
 /* HEADER */
 header{height:var(–hdr);background:var(–s1);border-bottom:1px solid var(–b1);
@@ -38,7 +39,7 @@ font-family:var(–font);transition:all .15s;white-space:nowrap;flex-shrink:0;}
 #coords{font-size:9px;color:var(–t3);letter-spacing:1px;min-width:80px;text-align:right;flex-shrink:0;}
 
 /* LAYOUT */
-.layout{display:flex;height:calc(100vh - var(–hdr));position:relative;}
+.layout{display:flex;height:calc(100vh - var(–hdr));height:calc(-webkit-fill-available - var(–hdr));position:relative;flex:1;min-height:0;}
 
 /* LEFT SIDEBAR — icônes catégories */
 .sidebar{width:var(–sb);background:var(–s1);border-right:1px solid var(–b1);
@@ -83,8 +84,8 @@ cursor:pointer;transition:all .12s;border:1px solid transparent;}
 .sp-item.active span{color:var(–t1);}
 
 /* CANVAS */
-.canvas-wrap{flex:1;position:relative;overflow:hidden;touch-action:none;}
-#cvs{width:100%;height:100%;display:block;touch-action:none;}
+.canvas-wrap{flex:1;position:relative;overflow:hidden;touch-action:none;min-height:0;}
+#cvs{position:absolute;top:0;left:0;width:100%;height:100%;display:block;touch-action:none;}
 
 /* TOOLBAR COMPACT/EXPANDED */
 .toolbar-wrap{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:25;}
@@ -1188,7 +1189,11 @@ refreshPorts();setMode(‘select’);hideCtx();
 // INIT
 // ════════════════════════════════════════
 buildSidebar();buildWCols();setMode(‘select’);
+
+function initCanvas(){
 const wrap0=document.getElementById(‘canvasWrap’).getBoundingClientRect();
+// Safari peut retourner 0 si le layout n’est pas encore calculé
+if(wrap0.width===0||wrap0.height===0){setTimeout(initCanvas,50);return;}
 vpX=wrap0.width/2;vpY=wrap0.height/2;applyVP();
 
 if(!loadLocal()){
@@ -1207,6 +1212,11 @@ cw(tb,‘OUT2’,d2,‘IN’,’#cc3311’);cw(d2,‘OUT’,p1,‘L-in’,’#cc
 pushUndo();updateLegend();
 deselectAll();
 }
+}
+
+// Attendre que le DOM soit prêt
+if(document.readyState===‘complete’){initCanvas();}
+else{window.addEventListener(‘load’,initCanvas);}
 </script>
 
 </body>
