@@ -5,7 +5,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>ÉlecDraw — CHEKELEC</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@600;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --a:#17b6c4;--a2:#0e8f9a;--warn:#e06020;--ok:#27ae60;
@@ -13,7 +12,8 @@
   --b1:#222640;--b2:#2d3252;--b3:#3a4068;
   --t1:#e8eaf0;--t2:#9aa0b8;--t3:#555d7a;
   --sb:50px;--hdr:42px;
-  --font:'DM Mono',monospace;--font2:'Syne',sans-serif;
+  --font:ui-monospace,'SF Mono',SFMono-Regular,Menlo,monospace;
+  --font2:-apple-system,BlinkMacSystemFont,'SF Pro Display',system-ui,sans-serif;
   --shadow:0 8px 32px rgba(0,0,0,.7);
   --radius:8px;
 }
@@ -790,7 +790,7 @@ function renderInst(inst){
   lbl.textContent=inst.label||(sym.id.toUpperCase().slice(0,4));
   lbl.setAttribute('x','0');lbl.setAttribute('y','32');lbl.setAttribute('text-anchor','middle');
   lbl.setAttribute('fill','#17b6c4');lbl.setAttribute('stroke','none');
-  lbl.setAttribute('font-size','8');lbl.setAttribute('font-family','DM Mono,monospace');
+  lbl.setAttribute('font-size','8');lbl.setAttribute('font-family','ui-monospace,monospace');
   lbl.setAttribute('class','inst-lbl');lbl.style.cursor='text';
   lbl.addEventListener('dblclick',ev=>{ev.stopPropagation();selectInst(inst);showCtx(inst,true);});
   g.appendChild(lbl);
@@ -907,7 +907,7 @@ function renderPort(inst,port){
   const fill=isFrom?'#ffffff':portColor;
   const circle=sv(g,'circle',{cx:wp.x,cy:wp.y,r:5.5,fill,stroke:'#080b12','stroke-width':'1.5',opacity:'.9'});
   // port id label
-  sv(g,'text',{x:wp.x,y:wp.y-9,fill:'#17b6c4','font-size':'7','text-anchor':'middle','font-family':'DM Mono,monospace',stroke:'none'},port.id);
+  sv(g,'text',{x:wp.x,y:wp.y-9,fill:'#17b6c4','font-size':'7','text-anchor':'middle','font-family':'ui-monospace,monospace',stroke:'none'},port.id);
   g.addEventListener('pointerdown',ev=>{ev.stopPropagation();onPortTap(inst,port,wp);});
   g.addEventListener('mouseenter',()=>{circle.setAttribute('r','7.5');});
   g.addEventListener('mouseleave',()=>{circle.setAttribute('r','5.5');});
